@@ -4,6 +4,7 @@ import uvicorn
 
 from app.api.api_v1.routers.users import users_router
 from app.api.api_v1.routers.auth import auth_router
+from app.api.api_v1.routers.f1 import f1_router
 from app.core import config
 from app.db.session import SessionLocal
 from app.core.auth import get_current_active_user
@@ -44,6 +45,22 @@ app.include_router(
     dependencies=[Depends(get_current_active_user)],
 )
 app.include_router(auth_router, prefix="/api", tags=["auth"])
+
+# F1 Router - Public API endpoints
+app.include_router(
+    f1_router,
+    prefix="/api/v1/f1",
+    tags=["f1"],
+)
+
+# F1 Import Router - Admin-only endpoints
+app.include_router(
+    f1_router,
+    prefix="/api/v1/admin/f1",
+    tags=["f1-admin"],
+    dependencies=[Depends(get_current_active_user)],
+    include_in_schema=False,
+)
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="0.0.0.0", reload=True, port=8888)
